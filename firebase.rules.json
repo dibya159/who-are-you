@@ -1,0 +1,57 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    "messages": {
+      ".read": true,
+      ".write": "auth != null || true",
+      ".indexOn": ["ts", "timestamp", "time"],
+      "$messageId": {
+        ".validate": "newData.hasChildren(['text']) || newData.hasChildren(['voice']) || newData.hasChildren(['message'])"
+      }
+    },
+    "dmRequests": {
+      "$toUid": {
+        ".read": "auth == null || auth.uid === $toUid",
+        "$fromUid": {
+          ".write": "auth == null || auth.uid === $fromUid || auth.uid === $toUid"
+        }
+      }
+    },
+    "dmFriends": {
+      "$uid": {
+        ".read": "auth == null || auth.uid === $uid",
+        ".write": "auth == null || auth.uid === $uid"
+      }
+    },
+    "dmThreads": {
+      "$pairId": {
+        ".read": "auth == null || $pairId.contains(auth.uid)",
+        "messages": {
+          ".indexOn": ["ts", "timestamp"],
+          "$msgId": {
+            ".write": "auth == null || $pairId.contains(auth.uid)"
+          }
+        }
+      }
+    },
+    "presence": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth == null || auth.uid === $uid"
+      }
+    },
+    "stories": {
+      ".read": true,
+      ".indexOn": ["ts", "timestamp", "createdAt"],
+      "$storyId": {
+        ".write": "auth == null || (newData.child('uid').val() === auth.uid)"
+      }
+    },
+    "users": {
+      ".read": true,
+      "$uid": {
+        ".write": "auth == null || auth.uid === $uid"
+      }
+    }
+  }
+}
